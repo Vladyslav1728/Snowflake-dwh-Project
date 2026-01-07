@@ -172,7 +172,7 @@ SELECT * FROM STG_TOP_FIVE_TRADABLE_CURRENCIES;
 ---
 ### **DIM tables**
 
-**1 - DIM_DATE :**
+### **1 - DIM_DATE :**
 **Tabuľka na poskytovanie informácií o čase a dátume**
 Berieme údaje z poddotazu, ktorý získava dáta z STG_FOREIGN_EXCHANGE_RATES_TRENDS. Odstránia sa nulové a duplicitné hodnoty.
 
@@ -214,7 +214,7 @@ FROM (
 ORDER BY DATE;
 ```
 
-**2 - DIM_CURRENCY :**
+### **2 - DIM_CURRENCY :**
 **Tabuľka na získavanie informácií o mene.**
 
 Berieme hodnoty zo staging tabuľky. Vytvárame 3 poddotazy: TOP5, G21, G7, ktoré čerpajú údaje z tabuliek STG_TOP5, STG_G7, STG_G21.
@@ -264,7 +264,7 @@ FROM (
 ORDER BY f.CURRENCY;
 ```
 
-**3 - DIM_STATUS :**
+### **3 - DIM_STATUS :**
 **Tabuľka na získavanie informácií o stave (DIM_STATUS)**
 
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné hodnoty.
@@ -293,7 +293,7 @@ FROM (
 ) AS unique_status;
 ```
 
-**4 - DIM_COUNTRY :**
+### **4 - DIM_COUNTRY :**
 **Tabuľka na získavanie informácií o krajinách (DIM_COUNTRY)**
 
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné a prázdne hodnoty.
@@ -558,3 +558,5 @@ ORDER BY d.SEASON;
 ---
 
 **Autor:** Shcherbyna Vladyslav a Davyd Shapovalov
+
+---
