@@ -28,7 +28,7 @@ DESCRIBE TABLE DIM_CURRENCY;
 - `Boolean` : TOP5, G21, G7, STATUS_FLAG
 - `Dátumové údaje` : DATE, PRICE_DATE, YEAR, MONTH, DAY, QUARTER
 
-- na čo bude analýza zameraná :
+Na čo bude analýza zameraná :
 Pre podrobnú analýzu výmenného kurzu sa pozrieme na peňažné meny; tabuľka faktov sa zameria na ne a na krajiny, nie na kryptomeny.
 
 <p align="center">
@@ -39,14 +39,15 @@ Pre podrobnú analýzu výmenného kurzu sa pozrieme na peňažné meny; tabuľk
 
 ---
 ### **Preparing**
-V Snowflake bola vytvorená verejná databáza : SCORPION_AND_SEAL_PROJECT_DB
-Bola vytvorena schema : labSKUSKA
+V Snowflake bola vytvorená verejná databáza : `SCORPION_AND_SEAL_PROJECT_DB`, a bola vytvorena schema : `labSKUSKA`
+
 ```sql
 CREATE DATABASE SCORPION_AND_SEAL_PROJECT_DB;
 USE DATABASE SCORPION_AND_SEAL_PROJECT_DB;
 CREATE OR REPLACE SCHEMA labSKUSKA;
 USE SCHEMA labSKUSKA;
 ```
+
 ---
 ### **STG tables**
 Začalo sa vytváranie tabuliek STG s niekoľkými úpravami pre pohodlnejšiu prácu.
@@ -60,19 +61,13 @@ Začalo sa vytváranie tabuliek STG s niekoľkými úpravami pre pohodlnejšiu p
   <em>ERD stage</em>
 </p>
 
-STG_CRYPTO_CURRENCY_HISTORICAL_DATA - Zobrazuje dátum, kryptomenu, názov meny a kurz, pri ktorom sa otvorila na burze, kurz, pri ktorom sa uzavrela, minimálnu hodnotu počas dňa a maximálnu hodnotu.
-
-STG_FOREIGN_EXCHANGE_RATE - Zobrazuje dátum a výmenný kurz každej svetovej meny voči doláru (každá mena v samostatnom stĺpci)
-
-STG_FOREIGN_EXCHANGE_RATES_TRENDS - Zobrazuje dátum, krajinu, menu, názov meny a kurz, pri ktorom sa otvorila na burze, kurz, pri ktorom sa uzavrela, minimálnu hodnotu počas dňa a maximálnu hodnotu.
-
-STG_G21_COUNTRY_CURRENCIES_FOREIGN_EXCHANGE_RATE - Stĺpce mien krajín zahrnutých do Global 21 a dátum a kurz pri uzávierke
-
-STG_G7_COUNTRY_CURRENCIES_FOREIGN_EXCHANGE_RATES - Stĺpce mien krajín zahrnutých do Global 7 a dátum a kurz pri uzávierke
-
-STG_TOP_100_MARKET_CAP_CRYPTO - Cena a názvy 100 najlepších kryptomien, dátumy zatvorenia a otvorenia na burze a denné maximá a minimá
-
-STG_TOP_FIVE_TRADABLE_CURRENCIES - 5 najobchodovanejších mien, dátum a cena na burze
+- `STG_CRYPTO_CURRENCY_HISTORICAL_DATA` - Zobrazuje dátum, kryptomenu, názov meny a kurz, pri ktorom sa otvorila na burze, kurz, pri ktorom sa uzavrela, minimálnu hodnotu počas dňa a maximálnu hodnotu.
+- `STG_FOREIGN_EXCHANGE_RATE` - Zobrazuje dátum a výmenný kurz každej svetovej meny voči doláru (každá mena v samostatnom stĺpci)
+- `STG_FOREIGN_EXCHANGE_RATES_TRENDS` - Zobrazuje dátum, krajinu, menu, názov meny a kurz, pri ktorom sa otvorila na burze, kurz, pri ktorom sa uzavrela, minimálnu hodnotu počas dňa a maximálnu hodnotu.
+- `STG_G21_COUNTRY_CURRENCIES_FOREIGN_EXCHANGE_RATE` - Stĺpce mien krajín zahrnutých do Global 21 a dátum a kurz pri uzávierke
+- `STG_G7_COUNTRY_CURRENCIES_FOREIGN_EXCHANGE_RATES` - Stĺpce mien krajín zahrnutých do Global 7 a dátum a kurz pri uzávierke
+- `STG_TOP_100_MARKET_CAP_CRYPTO` - Cena a názvy 100 najlepších kryptomien, dátumy zatvorenia a otvorenia na burze a denné maximá a minimá
+- `STG_TOP_FIVE_TRADABLE_CURRENCIES` - 5 najobchodovanejších mien, dátum a cena na burze
 
 ```sql
 CREATE OR REPLACE TABLE STG_CRYPTO_CURRENCY_HISTORICAL_DATA AS
@@ -152,7 +147,9 @@ SELECT
     DATE
 FROM FEDERAL_EXCHANGE_RATES.INSIGHTS.TOP_FIVE_TRADABLE_CURRENCIES_FOREIGN_EXCHANGE_RATE;
 ```
+
 Následne sme skontrolovali správnosť vytvorenia.
+
 ```sql
 SELECT
     CURRENCY,
@@ -172,20 +169,24 @@ SELECT * FROM STG_TOP_100_MARKET_CAP_CRYPTO;
 SELECT * FROM STG_TOP_FIVE_TRADABLE_CURRENCIES;
 ```
 
+---
 ## **DIM tables**
-DIM_DATE :
-Tabuľka na poskytovanie informácií o čase a dátume
+
+**DIM_DATE :**
+**Tabuľka na poskytovanie informácií o čase a dátume**
 Berieme údaje z poddotazu, ktorý získava dáta z STG_FOREIGN_EXCHANGE_RATES_TRENDS. Odstránia sa nulové a duplicitné hodnoty.
-DATE_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor.
-DATE – berieme priamo hodnotu dátumu zo staging tabuľky.
-DAY – cez DATE_PART() získame iba deň z dátumu.
-DOW – číslovanie dňa v týždni (americký štýl +1), začína od nedele.
-DOW_NAME – cez CASE názov dňa, napríklad 1 = ‘Monday’.
-MONTH – cez DATE_PART() získame mesiac z dátumu.
-YEAR – cez DATE_PART() získame rok z dátumu.
-QUARTER – rozdelenie roka na 4 časti, pre rýchle získanie údajov (nie úplne presné).
-SEASON – cez CASE názov ročného obdobia podľa dátumu.
-DIM_DATE  SCD: Type 0
+
+- DATE_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor.
+- DATE – berieme priamo hodnotu dátumu zo staging tabuľky.
+- DAY – cez DATE_PART() získame iba deň z dátumu.
+- DOW – číslovanie dňa v týždni (americký štýl +1), začína od nedele.
+- DOW_NAME – cez CASE názov dňa, napríklad 1 = ‘Monday’.
+- MONTH – cez DATE_PART() získame mesiac z dátumu.
+- YEAR – cez DATE_PART() získame rok z dátumu.
+- QUARTER – rozdelenie roka na 4 časti, pre rýchle získanie údajov (nie úplne presné).
+- SEASON – cez CASE názov ročného obdobia podľa dátumu.
+- DIM_DATE  SCD: Type 0
+
 ```sql
 CREATE OR REPLACE TABLE DIM_DATE AS
 SELECT
@@ -213,18 +214,21 @@ FROM (
 ORDER BY DATE;
 ```
 
-DIM_CURRENCY :
-Tabuľka na získavanie informácií o mene
+**DIM_CURRENCY :**
+**Tabuľka na získavanie informácií o mene.**
+
 Berieme hodnoty zo staging tabuľky. Vytvárame 3 poddotazy: TOP5, G21, G7, ktoré čerpajú údaje z tabuliek STG_TOP5, STG_G7, STG_G21.
 V týchto poddotazoch sa ukladajú názvy mien z INFORMATION_SCHEMA.COLUMNS, pretože potrebujeme zistiť, či mena patrí do TOP5, G7 alebo G21.
 Tiež berieme dáta z poddotazu, ktorý čerpá z STG_FOREIGN_EXCHANGE_RATES_TRENDS a odstraňuje duplicitné a prázdne hodnoty.
-CURRENCY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor.
-f.CURRENCY – samotná mena z poddotazu.
-f.DESCRIPTION – popis meny.
-TOP5 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v TOP5.
-G21 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G21.
-G7 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G7.
-DIM_CURRENCY  SCD: Type 1
+
+- CURRENCY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor.
+- f.CURRENCY – samotná mena z poddotazu.
+- f.DESCRIPTION – popis meny.
+- TOP5 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v TOP5.
+- G21 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G21.
+- G7 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G7.
+- DIM_CURRENCY  SCD: Type 1
+
 ```sql
 CREATE OR REPLACE TABLE DIM_CURRENCY AS
 WITH top5 AS (
@@ -260,16 +264,19 @@ FROM (
 ORDER BY f.CURRENCY;
 ```
 
-DIM_STATUS :
-Tabuľka na získavanie informácií o stave (DIM_STATUS)
+**DIM_STATUS :**
+**Tabuľka na získavanie informácií o stave (DIM_STATUS)**
+
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné hodnoty.
-STATUS_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každý stav.
-STATUS_FLAG – priamy boolean z pôvodnej tabuľky (ISACTIVE).
-STATUS_NAME – cez CASE sa prekladá flag na názov:
-TRUE = 'ACTIVE'
-FALSE = 'NO ACTIVE'
-NULL alebo iné = 'UNKNOWN'
-DIM_STATUS  SCD: Type 1
+
+- STATUS_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každý stav.
+- STATUS_FLAG – priamy boolean z pôvodnej tabuľky (ISACTIVE).
+- STATUS_NAME – cez CASE sa prekladá flag na názov:
+- TRUE = 'ACTIVE'
+- FALSE = 'NO ACTIVE'
+- NULL alebo iné = 'UNKNOWN'
+- DIM_STATUS  SCD: Type 1
+
 ```sql
 CREATE OR REPLACE TABLE DIM_STATUS AS
 SELECT
@@ -286,12 +293,15 @@ FROM (
 ) AS unique_status;
 ```
 
-DIM_COUNTRY :
-Tabuľka na získavanie informácií o krajinách (DIM_COUNTRY)
+**DIM_COUNTRY :**
+**Tabuľka na získavanie informácií o krajinách (DIM_COUNTRY)**
+
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné a prázdne hodnoty.
-COUNTRY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každú krajinu.
-COUNTRY_NAME – samotný názov krajiny zo staging tabuľky.
-DIM_COUNTRY  SCD: Type 0
+
+- COUNTRY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každú krajinu.
+- COUNTRY_NAME – samotný názov krajiny zo staging tabuľky.
+- DIM_COUNTRY  SCD: Type 0
+
 ```sql
 CREATE OR REPLACE TABLE DIM_COUNTRY AS
 SELECT
@@ -303,13 +313,16 @@ FROM (
     WHERE COUNTRY IS NOT NULL
 ) AS unique_countries;
 ```
+
 Následne sme skontrolovali správnosť vytvorenia.
+
 ```sql
 SELECT * FROM DIM_DATE;
 SELECT * FROM DIM_CURRENCY;
 SELECT * FROM DIM_COUNTRY;
 SELECT * FROM DIM_STATUS;
 ```
+
 ---
 ### **FACT table**
 
@@ -319,25 +332,27 @@ SELECT * FROM DIM_STATUS;
   <em>STAR schema</em>
 </p>
 
-FACT_FOREX :
-Tabuľka pre ukladanie faktov o menách
+**FACT_FOREX :**
+**Tabuľka pre ukladanie faktov o menách**
+
 Berieme údaje zo STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz a spájame ich s dimenziami:
-DIM_DATE -> dátum
-DIM_CURRENCY -> mena
-DIM_COUNTRY -> krajina
-DIM_STATUS -> stav aktivity
 
-FACT_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každý riadok v tabuľke.
-DATE_ID – ID dátumu z DIM_DATE.
-CURRENCY_ID – ID meny z DIM_CURRENCY.
-COUNTRY_ID – ID krajiny z DIM_COUNTRY.
-STATUS_ID – ID stavu z DIM_STATUS.
-OPEN, CLOSE, HIGH, LOW – pôvodné hodnoty otvorenia, zatvorenia, maxima a minima z STG tabuľky.
+- DIM_DATE -> dátum
+- DIM_CURRENCY -> mena
+- DIM_COUNTRY -> krajina
+- DIM_STATUS -> stav aktivity
 
-Window fun:
-CLOSE_DIFF – rozdiel medzi dnešnou a predchádzajúcou hodnotou zatvorenia pre rovnakú menu, počítané cez LAG().
-NEXT_CLOSE_DIFF – rozdiel medzi dnešnou a nasledujúcou hodnotou zatvorenia pre rovnakú menu, počítané cez LEAD() (napomáha pri predikcii).
-AVG_LAST_7_DAYS – priemerná hodnota zatvorenia za posledných 7 dní pre rovnakú menu a krajinu, počítané cez AVG() OVER() s PARTITION BY a ROWS BETWEEN 6 PRECEDING AND CURRENT ROW.
+- FACT_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každý riadok v tabuľke.
+- DATE_ID – ID dátumu z DIM_DATE.
+- CURRENCY_ID – ID meny z DIM_CURRENCY.
+- COUNTRY_ID – ID krajiny z DIM_COUNTRY.
+- STATUS_ID – ID stavu z DIM_STATUS.
+- OPEN, CLOSE, HIGH, LOW – pôvodné hodnoty otvorenia, zatvorenia, maxima a minima z STG tabuľky.
+
+**Window fun:**
+- CLOSE_DIFF – rozdiel medzi dnešnou a predchádzajúcou hodnotou zatvorenia pre rovnakú menu, počítané cez LAG().
+- NEXT_CLOSE_DIFF – rozdiel medzi dnešnou a nasledujúcou hodnotou zatvorenia pre rovnakú menu, počítané cez LEAD() (napomáha pri predikcii).
+- AVG_LAST_7_DAYS – priemerná hodnota zatvorenia za posledných 7 dní pre rovnakú menu a krajinu, počítané cez AVG() OVER() s PARTITION BY a ROWS BETWEEN 6 PRECEDING AND CURRENT ROW.
 
 Použité LEFT JOINy zabezpečujú, že každá mena, krajina, dátum a stav zodpovedá svojej dimenzii.
 WHERE podmienky zabezpečujú, že sa do FACT_FOREX uložia iba kompletné záznamy, kde CURRENCY, DATE a COUNTRY nie sú NULL.
@@ -376,10 +391,13 @@ WHERE f.CURRENCY IS NOT NULL
   AND f.DATE IS NOT NULL
   AND f.COUNTRY IS NOT NULL;
 ```
+
 Kontrola správnosti tabuľky faktov.
+
 ```sql
 SELECT * FROM FACT_FOREX;
 ```
+
 ---
 ### **Deleting tables**
 Po úspešnom vytvorení tabuliek faktov a tabuliek dim odstráňte tabuľky STG.
@@ -392,6 +410,7 @@ DROP TABLE IF EXISTS STG_G7_COUNTRY_CURRENCIES_FOREIGN_EXCHANGE_RATES;
 DROP TABLE IF EXISTS STG_TOP_100_MARKET_CAP_CRYPTO;
 DROP TABLE IF EXISTS STG_TOP_FIVE_TRADABLE_CURRENCIES;
 ```
+
 ---
 ## **Vizualizácia dát**
 Dashboard obsahuje vizualizácie, ktoré ukazujú hlavné trendy a správanie vybraných mien v rôznych obdobiach a sezónach. Tieto grafy pomáhajú lepšie pochopiť kolísanie kurzov a sezónne výkyvy.
