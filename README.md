@@ -170,9 +170,9 @@ SELECT * FROM STG_TOP_FIVE_TRADABLE_CURRENCIES;
 ```
 
 ---
-## **DIM tables**
+### **DIM tables**
 
-**DIM_DATE :**
+**1 - DIM_DATE :**
 **Tabuľka na poskytovanie informácií o čase a dátume**
 Berieme údaje z poddotazu, ktorý získava dáta z STG_FOREIGN_EXCHANGE_RATES_TRENDS. Odstránia sa nulové a duplicitné hodnoty.
 
@@ -185,7 +185,7 @@ Berieme údaje z poddotazu, ktorý získava dáta z STG_FOREIGN_EXCHANGE_RATES_T
 - YEAR – cez DATE_PART() získame rok z dátumu.
 - QUARTER – rozdelenie roka na 4 časti, pre rýchle získanie údajov (nie úplne presné).
 - SEASON – cez CASE názov ročného obdobia podľa dátumu.
-- DIM_DATE  SCD: Type 0
+- SCD: Type 0
 
 ```sql
 CREATE OR REPLACE TABLE DIM_DATE AS
@@ -214,7 +214,7 @@ FROM (
 ORDER BY DATE;
 ```
 
-**DIM_CURRENCY :**
+**2 - DIM_CURRENCY :**
 **Tabuľka na získavanie informácií o mene.**
 
 Berieme hodnoty zo staging tabuľky. Vytvárame 3 poddotazy: TOP5, G21, G7, ktoré čerpajú údaje z tabuliek STG_TOP5, STG_G7, STG_G21.
@@ -227,7 +227,7 @@ Tiež berieme dáta z poddotazu, ktorý čerpá z STG_FOREIGN_EXCHANGE_RATES_TRE
 - TOP5 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v TOP5.
 - G21 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G21.
 - G7 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G7.
-- DIM_CURRENCY  SCD: Type 1
+- SCD: Type 1
 
 ```sql
 CREATE OR REPLACE TABLE DIM_CURRENCY AS
@@ -264,7 +264,7 @@ FROM (
 ORDER BY f.CURRENCY;
 ```
 
-**DIM_STATUS :**
+**3 - DIM_STATUS :**
 **Tabuľka na získavanie informácií o stave (DIM_STATUS)**
 
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné hodnoty.
@@ -275,7 +275,7 @@ Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstrán
 - TRUE = 'ACTIVE'
 - FALSE = 'NO ACTIVE'
 - NULL alebo iné = 'UNKNOWN'
-- DIM_STATUS  SCD: Type 1
+- SCD: Type 1
 
 ```sql
 CREATE OR REPLACE TABLE DIM_STATUS AS
@@ -293,14 +293,14 @@ FROM (
 ) AS unique_status;
 ```
 
-**DIM_COUNTRY :**
+**4 - DIM_COUNTRY :**
 **Tabuľka na získavanie informácií o krajinách (DIM_COUNTRY)**
 
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné a prázdne hodnoty.
 
 - COUNTRY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každú krajinu.
 - COUNTRY_NAME – samotný názov krajiny zo staging tabuľky.
-- DIM_COUNTRY  SCD: Type 0
+- SCD: Type 0
 
 ```sql
 CREATE OR REPLACE TABLE DIM_COUNTRY AS
