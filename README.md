@@ -17,14 +17,17 @@ DESCRIBE TABLE DIM_COUNTRY;
 DESCRIBE TABLE DIM_DATE;
 DESCRIBE TABLE DIM_CURRENCY;
 ```
-NUMBER
-BOOLEAN
-VARCHAR
-DATE
-Číselné údaje : OPEN, CLOSE, HIGH, LOW, VOLUME, CLOSE_DIFF, NEXT_CLOSE_DIFF, AVG_LAST_7_DAYS
-Textové údaje : CURRENCY, DESCRIPTION, COUNTRY_NAME, STATUS_NAME, DOW_NAME, SEASON
-Boolean : TOP5, G21, G7, STATUS_FLAG
-Dátumové údaje : DATE, PRICE_DATE, YEAR, MONTH, DAY, QUARTER
+
+- `NUMBER`
+- `BOOLEAN`
+- `VARCHAR`
+- `DATE`
+
+- `Číselné údaje` : OPEN, CLOSE, HIGH, LOW, VOLUME, CLOSE_DIFF, NEXT_CLOSE_DIFF, AVG_LAST_7_DAYS
+- `Textové údaje` : CURRENCY, DESCRIPTION, COUNTRY_NAME, STATUS_NAME, DOW_NAME, SEASON
+- `Boolean` : TOP5, G21, G7, STATUS_FLAG
+- `Dátumové údaje` : DATE, PRICE_DATE, YEAR, MONTH, DAY, QUARTER
+
 - na čo bude analýza zameraná :
 Pre podrobnú analýzu výmenného kurzu sa pozrieme na peňažné meny; tabuľka faktov sa zameria na ne a na krajiny, nie na kryptomeny.
 
@@ -182,6 +185,7 @@ MONTH – cez DATE_PART() získame mesiac z dátumu.
 YEAR – cez DATE_PART() získame rok z dátumu.
 QUARTER – rozdelenie roka na 4 časti, pre rýchle získanie údajov (nie úplne presné).
 SEASON – cez CASE názov ročného obdobia podľa dátumu.
+DIM_DATE  SCD: Type 0
 ```sql
 CREATE OR REPLACE TABLE DIM_DATE AS
 SELECT
@@ -220,6 +224,7 @@ f.DESCRIPTION – popis meny.
 TOP5 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v TOP5.
 G21 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G21.
 G7 – boolean flag, cez CASE kontrolujeme, či je f.CURRENCY v G7.
+DIM_CURRENCY  SCD: Type 1
 ```sql
 CREATE OR REPLACE TABLE DIM_CURRENCY AS
 WITH top5 AS (
@@ -264,6 +269,7 @@ STATUS_NAME – cez CASE sa prekladá flag na názov:
 TRUE = 'ACTIVE'
 FALSE = 'NO ACTIVE'
 NULL alebo iné = 'UNKNOWN'
+DIM_STATUS  SCD: Type 1
 ```sql
 CREATE OR REPLACE TABLE DIM_STATUS AS
 SELECT
@@ -285,6 +291,7 @@ Tabuľka na získavanie informácií o krajinách (DIM_COUNTRY)
 Berieme údaje z STG_FOREIGN_EXCHANGE_RATES_TRENDS cez poddotaz, ktorý odstráni duplicitné a prázdne hodnoty.
 COUNTRY_ID – cez window funkciu ROW_NUMBER() sa nastaví unikátny identifikátor pre každú krajinu.
 COUNTRY_NAME – samotný názov krajiny zo staging tabuľky.
+DIM_COUNTRY  SCD: Type 0
 ```sql
 CREATE OR REPLACE TABLE DIM_COUNTRY AS
 SELECT
