@@ -1,3 +1,5 @@
+**Autor:** Shcherbyna Vladyslav a Davyd Shapovalov
+
 ### **Selecting a database**
 Federal Exchange Rates 
 https://app.snowflake.com/marketplace/listing/GZTYZAPS3FL/insights-federal-exchange-rates
@@ -560,5 +562,6 @@ ORDER BY d.SEASON;
 ---
 
 **Autor:** Shcherbyna Vladyslav a Davyd Shapovalov
+
 
 ---
